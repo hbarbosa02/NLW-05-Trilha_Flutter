@@ -1,11 +1,24 @@
 import 'package:DevQuiz/challenge/widgets/awnser/awnser_widget.dart';
 import 'package:DevQuiz/core/app_text_styles.dart';
+import 'package:DevQuiz/shared/models/awnser_model.dart';
+import 'package:DevQuiz/shared/models/question_model.dart';
 import 'package:flutter/material.dart';
 
-class QuizWidget extends StatelessWidget {
-  final String title;
+class QuizWidget extends StatefulWidget {
+  final QuestionModel question;
+  final VoidCallback onChange;
 
-  const QuizWidget({Key? key, required this.title}) : super(key: key);
+  const QuizWidget({Key? key, required this.question, required this.onChange})
+      : super(key: key);
+
+  @override
+  _QuizWidgetState createState() => _QuizWidgetState();
+}
+
+class _QuizWidgetState extends State<QuizWidget> {
+  int indexSelected = -1;
+
+  AwnserModel awnsers(int index) => widget.question.awsers[index];
 
   @override
   Widget build(BuildContext context) {
@@ -14,25 +27,24 @@ class QuizWidget extends StatelessWidget {
         children: [
           SizedBox(height: 64),
           Text(
-            title,
+            widget.question.title,
             style: AppTextStyles.heading,
           ),
           SizedBox(height: 24),
-          AwnserWidget(
-              isRight: false,
-              title: "Kit de desenvolvimento de interface de usuário"),
-          AwnserWidget(
-              isRight: true,
-              isSelected: true,
-              title:
-                  "Possibilita a criação de aplicativos compilados nativamente"),
-          AwnserWidget(
-              isRight: false,
-              title: "Acho que é uma marca de café do Himalaia"),
-          AwnserWidget(
-              isRight: false,
-              title:
-                  "Possibilita a criação de desktops que são muito incríveis"),
+          for (var i = 0; i < widget.question.awsers.length; i++)
+            AwnserWidget(
+              awnser: awnsers(i),
+              disabled: indexSelected != -1,
+              isSelected: indexSelected == i,
+              onTap: () {
+                indexSelected = i;
+
+                setState(() {});
+
+                Future.delayed(Duration(seconds: 2))
+                    .then((value) => widget.onChange());
+              },
+            )
         ],
       ),
     );
